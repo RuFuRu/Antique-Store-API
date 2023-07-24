@@ -30,12 +30,12 @@ builder.Services.AddSwaggerGen(options =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath);
 });
+Console.WriteLine(Directory.GetCurrentDirectory() + "/antiquestoreapi.db");
 builder.Services.AddScoped<IDbOperation, DbOperation>();
 builder.Services.AddDbContext<MainContext>(options =>
 {
-    options.UseSqlite(
-        builder.Configuration["ConnectionStrings:DBconnection"]
-    );
+    //var conStr = $"Data Source={Directory.GetCurrentDirectory()}";
+    options.UseSqlite(ConStr.GetConStr());
 });
 
 var app = builder.Build();
@@ -46,7 +46,6 @@ app.UseSwaggerUI(options =>
 {
     options.DocumentTitle = "Antique Store REST API";
 });
-
 
 app.UseAuthorization();
 

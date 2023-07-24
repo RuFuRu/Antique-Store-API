@@ -14,6 +14,6 @@ public class MainContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite(_configuration.GetConnectionString("DBconnection"));
+        optionsBuilder.UseSqlite(ConStr.GetConStr());
     }
 }
