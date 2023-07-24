@@ -41,14 +41,12 @@ builder.Services.AddDbContext<MainContext>(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.DocumentTitle = "Antique Store REST API";
-    });
-}
+    options.DocumentTitle = "Antique Store REST API";
+});
+
 
 app.UseAuthorization();
 
