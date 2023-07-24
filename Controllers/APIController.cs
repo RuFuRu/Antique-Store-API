@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Antique_Store_API.Controllers;
-[Route("api/v1/product/")]
+[Route("api/v1/products")]
 [ApiController]
 public class APIController : ControllerBase
 {
@@ -17,14 +17,32 @@ public class APIController : ControllerBase
 
     
     /// <summary>
-    /// Gets all the Products from the database.
+    /// Gets all the Products from the database. The response can be filtered to by name or tag
     /// </summary>
     /// <returns>Returns a list of all products available in the database.</returns>
     /// <response code="200">Returns all products</response>
     /// <response code="404">No products were found</response>
+    /// <response code="500">There seem to have been an error on the server. Try again!</response>
     [HttpGet]
-    public async Task<ActionResult<List<Product>>> getAllProducts()
+    public async Task<ActionResult<List<Product>>> getAllProducts([FromQuery] string? name, [FromQuery] string? tag)
     {
+        if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(tag))
+        {
+            var result = await _products.GetProductByNameAndTag(name, tag);
+            return Ok(result);
+        }
+        if (!string.IsNullOrEmpty(name))
+        {
+            var result = await _products.GetProductByName(name);
+            //if (result is null) return NotFound("Product with that name has not been found");
+            return Ok(result);
+        } 
+        if (!string.IsNullOrEmpty(tag))
+        {
+            var result = await _products.GetProductsByTag(tag);
+            //if (result is null) return NotFound("Products with these tags have not been found");
+            return Ok(result);
+        }
         return await _products.GetAllProducts();
     }
 
@@ -35,6 +53,7 @@ public class APIController : ControllerBase
     /// <returns>Returns the Product with the specified ID, if found.</returns>
     /// <response code="200">Returns a product that matches the provided id</response>
     /// <response code="404">No products with the provided id were found</response>
+    /// <response code="500">There seem to have been an error on the server. Try again!</response>
     [HttpGet("{id}")]
     public async Task<ActionResult<Product?>> getProductById(int id)
     {
@@ -45,41 +64,12 @@ public class APIController : ControllerBase
     }
 
     /// <summary>
-    /// Gets Products based on the specified tag.
-    /// </summary>
-    /// <param name="tag">The tag to filter Products.</param>
-    /// <returns>Returns a list of Products that match the specified tag.</returns>
-    /// <response code="200">Returns all products matched by the provided tag name</response>
-    /// <response code="404">No products with this tag name were found</response>
-    [HttpGet("getbytag")]
-    public async Task<ActionResult<List<Product>?>> getProductByTag([FromQuery] string tag)
-    {
-        var result = await _products.GetProductsByTag(tag);
-        if (result is null) return NotFound("Products with these tags have not been found");
-        return Ok(result);
-    }
-
-    /// <summary>
-    /// Gets a Product based on the specified name.
-    /// </summary>
-    /// <param name="name">The name to search for a Product.</param>
-    /// <returns>Returns the Product that matches the specified name, if found.</returns>
-    /// <response code="200">Returns all products matched by the provided product name</response>
-    /// <response code="404">No Products with such name were found</response>
-    [HttpGet("getbyname")]
-    public async Task<ActionResult<Product>?> getProductByName([FromQuery] string name)
-    {
-        var result = await _products.GetProductByName(name);
-        if (result is null) return NotFound("Product with that name has not been found");
-        return Ok(result);
-    }
-
-    /// <summary>
     /// Adds a new Product to the database.
     /// </summary>
     /// <param name="product">The Product object to be added.</param>
     /// <returns>Returns the list of Products after adding the new Product.</returns>
     /// <response code="201">Adds the provided product into the database</response>
+    /// <response code="500">There seem to have been an error on the server. Try again!</response>
     [HttpPost]
     public async Task<ActionResult<List<Product>>> addProduct(Product product)
     {
@@ -95,6 +85,7 @@ public class APIController : ControllerBase
     /// <returns>Returns the list of Products after modifying the existing Product.</returns>
     /// <response code="200">Modifies the product with the provided id </response>
     /// <response code="404">No Products with such id were found</response>
+    /// <response code="500">There seem to have been an error on the server. Try again!</response>
     [HttpPut("{id}")]
     public async Task<ActionResult<List<Product>?>> modifyProduct(int id, Product product)
     {
@@ -110,6 +101,7 @@ public class APIController : ControllerBase
     /// <returns>Returns the list of Products after deleting the specified Product.</returns>
     /// <response code="200">Deletes the product with the provided id </response>
     /// <response code="404">No Products with such id were found</response>
+    /// <response code="500">There seem to have been an error on the server. Try again!</response>
     [HttpDelete("{id}")]
     public async Task<ActionResult<List<Product>?>> deleteProduct(int id)
     {
@@ -125,7 +117,8 @@ public class APIController : ControllerBase
     /// <returns>Returns the list of Products after deleting the specified Products by name.</returns>
     /// <response code="200">Deletes the product with the provided name </response>
     /// <response code="404">No Products with such name were found</response>
-    [HttpDelete("deletebyname")]
+    /// <response code="500">There seem to have been an error on the server. Try again!</response>
+    [HttpDelete]
     public async Task<ActionResult<List<Product>?>> deleteProductBasedOffName([FromQuery] string name)
     {
         var result = await _products.DeleteProductBasedOffName(name);

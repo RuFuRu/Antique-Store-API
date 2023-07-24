@@ -35,6 +35,14 @@ public class DbOperation : IDbOperation
         return product ?? null;
     }
 
+    public async Task<List<Product>?> GetProductByNameAndTag(string name, string tag)
+    {
+        var product = await _context.Products
+            .Where(p => (p.Name.StartsWith(name) || p.Name.EndsWith(name)) && (p.tag.StartsWith(tag) || p.tag.EndsWith(tag)))
+            .ToListAsync();
+        return product ?? null;
+    }
+
     public async Task<List<Product>> AddProduct(Product product)
     {
         _context.Products.Add(product);

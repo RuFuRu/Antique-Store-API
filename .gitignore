@@ -3,3 +3,5 @@ appsettings.*
 /Properties
 /bin
 /obj
+.vscode
+.idea
