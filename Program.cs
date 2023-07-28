@@ -37,6 +37,10 @@ builder.Services.AddDbContext<MainContext>(options =>
     //var conStr = $"Data Source={Directory.GetCurrentDirectory()}";
     options.UseSqlite(ConStr.GetConStr());
 });
+builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
+{
+    build.AllowAnyOrigin().AllowAnyHeader();
+}));
 
 var app = builder.Build();
 
@@ -47,6 +51,8 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API Name v1");
     options.DocumentTitle = "Antique Store REST API";
 });
+
+app.UseCors("corspolicy");
 
 app.UseAuthorization();
 

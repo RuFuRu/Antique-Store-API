@@ -1,5 +1,6 @@
 using System.Net;
 using Antique_Store_API.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +24,7 @@ public class APIController : ControllerBase
     /// <response code="200">Returns all products</response>
     /// <response code="404">No products were found</response>
     /// <response code="500">There seem to have been an error on the server. Try again!</response>
+    [EnableCors("corspolicy")]
     [HttpGet]
     public async Task<ActionResult<List<Product>>> getAllProducts([FromQuery] string? name, [FromQuery] string? tag)
     {
@@ -54,6 +56,7 @@ public class APIController : ControllerBase
     /// <response code="200">Returns a product that matches the provided id</response>
     /// <response code="404">No products with the provided id were found</response>
     /// <response code="500">There seem to have been an error on the server. Try again!</response>
+    [EnableCors("corspolicy")]
     [HttpGet("{id}")]
     public async Task<ActionResult<Product?>> getProductById(int id)
     {
